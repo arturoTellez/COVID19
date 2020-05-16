@@ -132,6 +132,8 @@ table(datos_actuales$RESULTADO_merge)
 
 summary(datos_actuales)
 
+save(datos_actuales, file = "Datos_covid.RData")
+
 coordenadas <- read.csv("inputs/AGEEML_20204142212409.csv")
 
 dim(coordenadas)
@@ -623,15 +625,18 @@ widget_file_size(partial_bundle(fig), "enfermedades_confirmados.html")
 
 agrupar_edades <- function(edad, grupo = 5, omega = 110){
     i = 1
+    edad_original = edad
     while((i * grupo) < omega){
-        edad[edad >= (i - 1) * grupo & edad <(i) * grupo] = paste0("[", (i - 1) * grupo, ",", (i) * grupo, ")")
+        print(i)
+        edad[(edad_original >= ((i - 1) * grupo)) & (edad_original <(i * grupo))] = paste0("[", (i - 1) * grupo, ",", (i) * grupo, ")")
         i = i + 1
     }
     if((i - 1)* grupo < omega){
-        edad[edad >= (i - 1) * grupo] = paste0("[", (i - 1) * grupo, ",", (i) * grupo, ")")
+        edad[edad_original >= (i - 1) * grupo] = paste0("[", (i - 1) * grupo, ",", (i) * grupo, ")")
     }
     return(edad)
 }
+fallecimientos$EDAD_5 <- agrupar_edades(fallecimientos$EDAD)
 
 fallecimientos$diff_dias_fallecimiento <- as.numeric(as.Date(fallecimientos$FECHA_DEF) - as.Date(fallecimientos$FECHA_SINTOMAS))
 fallecimientos$EDAD_5 <- as.factor(agrupar_edades(fallecimientos$EDAD))
